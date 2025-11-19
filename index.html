@@ -1,329 +1,733 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>화학 올림피아드 KMChC 4개월 단기 완성 로드맵</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            font-family: 'Inter', 'Noto Sans KR', sans-serif;
-            background-color: #f0fdf4; 
-        }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 900px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 350px; 
-            max-height: 400px;
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 400px;
-            }
-        }
-        .step-card {
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .step-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(134, 250, 155, 0.7), 0 4px 6px -2px rgba(134, 250, 155, 0.4);
-        }
-    </style>
-</head>
-<body class="bg-green-50 text-gray-800">
-    <!-- Chosen Palette: Energetic & Hopeful (Teal, Green, Indigo, Yellow) -->
-    <!-- Application Structure Plan: "4-Month Countdown Dashboard for KMChC 2/15." The structure is built around the verified KMChC schedule and content scope. Section 1: Goal & Verified Dates (Using 2025 data to project 2026 dates). Highlight the General/Advanced track decision. Section 2: The 4-Step Monthly Strategy (Nov 2025 -> Feb 15, 2026). Steps are focused on covering the wide General Chemistry scope required for KMChC. Step 3 (January) is marked for registration and final theory push. Section 3: Urgency Map (Chart.js visualization) showing the required acceleration. Section 4: Action Center (KMChC Scope Breakdown, Official Link). The structure ensures parents understand the short timeline and the nature of the content (Gen Chem I/II fundamentals). -->
-    <!-- Visualization & Content Choices: 1. Goal & Dates: Goal=Inform. Method=HTML/Tailwind Highlight Card. Justification=Confirms the Feb 15 date and introduces the two tracks (General/Advanced). 2. 4-Step Countdown: Goal=Organize/Interact. Method=Clickable `step-card`s (monthly focus). Interaction=Dynamic content update. Justification=Breaks the 4-month prep into manageable monthly goals tied to General Chemistry topics. 3. Urgency Map: Goal=Change/Organize. Method=Chart.js Line Chart. X-axis shows the 4-month span. Justification=Visually conveys the required intensity. Library=Chart.js/Canvas. 4. Action Center: Goal=Inform/Verify/Organize. Method=HTML/Tailwind List, Button, and Comparative Grid. Justification=Provides verified scope details and the official source. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Atom, 
+  Beaker, 
+  BookOpen, 
+  TrendingUp, 
+  Award, 
+  Microscope, 
+  Star, 
+  Quote, 
+  Phone, 
+  Youtube, 
+  Clock, 
+  Menu, 
+  X,
+  CheckCircle2,
+  Target,
+  Sparkles,
+  Crown,
+  Rocket,
+  Lightbulb,
+  BarChart3,
+  PieChart,
+  LineChart
+} from 'lucide-react';
 
-    <div class="container mx-auto max-w-7xl p-4 md:p-10">
-        
-        <header class="text-center mb-10 p-6 bg-white rounded-xl shadow-lg border-b-4 border-green-500">
-            <div class="text-5xl mb-3">🧪🏆</div>
-            <h1 class="text-3xl md:text-4xl font-extrabold text-indigo-700">KMChC 4개월 단기 완성 로드맵 (중2 대상)</h1>
-            <p class="text-xl text-gray-600 mt-2">🔥 2026년 2월 15일 시험을 향한 초고강도 4개월 집중 플랜 🔥</p>
-        </header>
+/**
+ * --------------------------------------------------------------------------
+ * CUSTOM CSS & ANIMATIONS (For Text Effects)
+ * --------------------------------------------------------------------------
+ */
+const customStyles = `
+  @keyframes shine {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  @keyframes starburst {
+    0% { transform: scale(1); opacity: 0.9; text-shadow: 0 0 0px rgba(16, 185, 129, 0); }
+    50% { transform: scale(1.02); opacity: 1; text-shadow: 0 0 30px rgba(16, 185, 129, 0.6), 0 0 60px rgba(56, 189, 248, 0.4); }
+    100% { transform: scale(1); opacity: 0.9; text-shadow: 0 0 0px rgba(16, 185, 129, 0); }
+  }
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+  .animate-text-shine {
+    background: linear-gradient(to right, #10b981, #3b82f6, #8b5cf6, #10b981);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-size: 200% auto;
+    animation: shine 4s linear infinite;
+  }
+  .animate-starburst {
+    animation: starburst 3s ease-in-out infinite;
+  }
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  /* UPDATED: "Impossible Effort" Text Style (First Image Request) */
+  .impossible-effort-text {
+    font-family: 'Playfair Display', serif;
+    background: linear-gradient(135deg, #ef4444 0%, #f59e0b 50%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    text-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
+    position: relative;
+    display: inline-block;
+  }
+`;
 
+/**
+ * --------------------------------------------------------------------------
+ * DATA ASSETS
+ * --------------------------------------------------------------------------
+ */
+
+// 2026 단기 완성
+const roadmap2026 = [
+  {
+    year: "2025년 11-12월",
+    title: "화학적 사고의 기틀 🧠",
+    subtitle: "원자/결합 폭파 단계",
+    desc: "원자부터 분자까지! 올림피아드형 뇌 구조를 만드는 시기입니다.",
+    details: [
+      "🧪 1주: 현대 원자 모형과 오비탈(s,p,d) 완벽 이해",
+      "📊 2주: 주기율표의 숨겨진 규칙 찾기 (유효 핵전하)",
+      "⚡ 3주: 화학 결합의 에너지 원리 & 루이스 구조",
+      "🧊 4주: 분자 구조를 3D로 그려보기 (VSEPR)"
+    ],
+    icon: Atom,
+    color: "text-indigo-700",
+    borderColor: "border-indigo-400",
+    bgIcon: "bg-indigo-100"
+  },
+  {
+    year: "2026년 1월 (겨울방학)",
+    title: "킬러 문항 완전 정복 ⚔️",
+    subtitle: "반응/평형 집중 단계",
+    desc: "양적 관계와 열역학! 입시에서 가장 어려운 산을 넘습니다.",
+    details: [
+      "💨 기체: 이상 기체 vs 실제 기체 차이 잡기",
+      "⚖️ 평형: 르 샤틀리에 원리로 변화 예측하기",
+      "🧪 산염기: 완충 용액과 적정 곡선 마스터",
+      "🔋 전기화학: 네른스트 식으로 전압 계산하기"
+    ],
+    icon: Beaker,
+    color: "text-teal-700",
+    borderColor: "border-teal-400",
+    bgIcon: "bg-teal-100"
+  },
+  {
+    year: "2026년 1월 말 (접수)",
+    title: "실전 시뮬레이션 📋",
+    subtitle: "1월 완성 및 접수",
+    desc: "접수부터 시험 당일 루틴까지, 완벽하게 준비하는 단계입니다.",
+    details: [
+      "📅 행정: 1/9~1/26 원서 접수 및 서류 꼼꼼 체크",
+      "⏰ 모의고사: 120분 타임어택 & OMR 마킹 훈련",
+      "🩺 클리닉: 자주 틀리는 문제 유형 집중 치료",
+      "🧘 멘탈: 고사장 환경 적응 훈련 (이미지 트레이닝)"
+    ],
+    icon: TrendingUp,
+    color: "text-green-700",
+    borderColor: "border-green-500",
+    bgIcon: "bg-green-100"
+  },
+  {
+    year: "2026년 2월 (D-Day)",
+    title: "최상의 컨디션 완성 🏆",
+    subtitle: "2월 실전 파이널",
+    desc: "오후 2시, 시험 시간에 맞춰 내 몸과 머리를 최적화합니다.",
+    details: [
+      "⏰ 바이오리듬: 오후 2시 두뇌 풀가동 루틴 만들기",
+      "🎒 준비물: 수험표, 계산기, 고사장 동선 체크",
+      "🔥 파이널: 기출 변형 킬러 문항 최종 리허설",
+      "🎉 D-Day: 2026.02.15 압도적 실력 발휘!"
+    ],
+    icon: Award,
+    color: "text-yellow-700",
+    borderColor: "border-yellow-400",
+    bgIcon: "bg-yellow-100"
+  }
+];
+
+// 2027 장기 플랜
+const roadmap2027 = [
+  {
+    year: "2025년 목표 🌱",
+    title: "과학적 문해력 키우기",
+    subtitle: "중등 과정 완성",
+    desc: "중등 과학 전체를 관통하는 화학의 원리를 몸에 익힙니다.",
+    details: [
+      "⚖️ 양적관계: 화학 반응식 논리적으로 세우기",
+      "🗣️ 언어습득: 원소 기호, 이온식 자유자재로 쓰기",
+      "🌉 연결고리: 고등 화학 I 핵심(몰, 농도) 맛보기",
+      "⚗️ 실험탐구: 눈으로 보고 이해하는 직관적 학습"
+    ],
+    icon: BookOpen,
+    color: "text-emerald-700",
+    borderColor: "border-emerald-400",
+    bgIcon: "bg-emerald-100"
+  },
+  {
+    year: "2026년 상반기 🚀",
+    title: "수능 그 이상의 실력",
+    subtitle: "고등 화학 심화",
+    desc: "단순 암기 NO! 현상을 원리로 설명하는 진짜 실력을 만듭니다.",
+    details: [
+      "🏗️ 구조: 오비탈과 분자 구조 입체적으로 보기",
+      "🔥 에너지: 엔탈피와 반응열 계산 정복",
+      "⚡ 속도: 화학 평형과 반응 속도 완벽 이해",
+      "🎯 중간점검: 2026 KMChC 기출 50% 이상 맞추기"
+    ],
+    icon: Microscope,
+    color: "text-cyan-700",
+    borderColor: "border-cyan-400",
+    bgIcon: "bg-cyan-100"
+  },
+  {
+    year: "2026년 하반기 🎓",
+    title: "영재고 입시 공략",
+    subtitle: "대학 일반화학 (Zumdahl)",
+    desc: "대학 수준의 이론으로 무장하여 경쟁자들과 격차를 벌립니다.",
+    details: [
+      "🌡️ 열역학: 엔트로피와 깁스 자유 에너지(G) 이해",
+      "📈 반응속도: 미분/적분 속도식 유도해보기",
+      "🔋 전기화학: 배터리 원리와 전압 계산",
+      "🛣️ 트랙설정: 나에게 맞는 입시 전략(일반/심화) 확정"
+    ],
+    icon: Beaker,
+    color: "text-blue-700",
+    borderColor: "border-blue-400",
+    bgIcon: "bg-blue-100"
+  },
+  {
+    year: "2027년 목표 👑",
+    title: "올림피아드 & 입시 완성",
+    subtitle: "출제자 머리 위에 서기",
+    desc: "메타인지 학습법으로 어떤 난이도에도 흔들리지 않는 멘탈 완성!",
+    details: [
+      "📊 기출분석: 10년치 기출 & 변형 문제 씹어먹기",
+      "🤔 전략수립: 다각적 풀이법 연구 & 시간 관리",
+      "💯 실전대비: 모의고사로 자신감 200% 충전",
+      "🗣️ 면접연계: 영재고 심층 면접까지 한 번에 대비"
+    ],
+    icon: Award,
+    color: "text-violet-700",
+    borderColor: "border-violet-400",
+    bgIcon: "bg-violet-100"
+  }
+];
+
+// 후기 데이터
+const reviews = [
+  {
+    name: "김대영 (2025 상산고 합격)",
+    tag: "인증된 합격 ✨✅",
+    title: "1학년 때의 올림피아드 도전, 합격의 열쇠가 되다 🗝️",
+    content: "중1 때 달돌과학에서 화학 올림피아드를 준비했던 경험이 정말 결정적이었습니다. 단순히 상을 타는 것을 넘어, 깊이 있게 사고하는 훈련을 했던 것이 상산고 면접에서 큰 힘이 되었어요. 후배님들도 꼭 도전해보세요!",
+    bg: "bg-white",
+    border: "border-t-4 border-indigo-500",
+    text: "text-gray-800",
+    icon: Crown 
+  },
+  {
+    name: "2023 양현제 경기북과고 합격",
+    tag: "영재고 합격 ✨🏆",
+    title: "올림피아드 준비가 곧 과고 입시의 지름길! 🚀",
+    content: "KMChC 금상을 목표로 공부하면서 심화 문제에 대한 두려움이 사라졌습니다. 달돌과학에서 배운 원리 중심의 풀이는 경기북과고 소집 면접에서도 빛을 발했습니다. 화학만큼은 누구보다 자신 있게 만들 수 있었어요.",
+    bg: "bg-white",
+    border: "border-t-4 border-teal-500",
+    text: "text-gray-800",
+    icon: Rocket
+  },
+  {
+    name: "2025 이석호 수능화학 만점",
+    tag: "수능 만점 ✨💯",
+    title: "킬러 문항도 논리로 풀어내는 힘을 길렀습니다 🌟",
+    content: "고난도 양적 관계 문제도 달돌과학에서 배운 접근법으로 보면 패턴이 보입니다. 단순 암기가 아니라 현상을 꿰뚫어 보는 눈을 가지게 된 덕분에 수능 화학 만점이라는 결과를 얻을 수 있었습니다. 최고의 선택이었습니다.",
+    bg: "bg-white",
+    border: "border-t-4 border-yellow-500",
+    text: "text-gray-800",
+    icon: Lightbulb
+  }
+];
+
+/**
+ * --------------------------------------------------------------------------
+ * COMPONENTS
+ * --------------------------------------------------------------------------
+ */
+
+// 1. Particle Background
+const ParticleBackground = () => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+    
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const particles = [];
+    for (let i = 0; i < 30; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 10 + 2,
+        dy: Math.random() * 0.5 + 0.1,
+        dx: (Math.random() - 0.5) * 0.5,
+        color: `rgba(${Math.floor(Math.random() * 50 + 50)}, ${Math.floor(Math.random() * 150 + 100)}, ${Math.floor(Math.random() * 150 + 100)}, 0.15)`
+      });
+    }
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.y -= p.dy;
+        p.x += p.dx;
+        if (p.y < -20) p.y = canvas.height + 20;
+        if (p.x > canvas.width + 20) p.x = -20;
+        if (p.x < -20) p.x = canvas.width + 20;
         
-        <section class="mb-12">
-            <h2 class="text-2xl md:text-3xl font-bold text-teal-600 mb-6 border-l-4 border-teal-400 pl-3">✅ 미션 및 핵심 일정 (Fact Check 완료)</h2>
-            <div class="bg-green-100 p-6 rounded-lg shadow-md border-2 border-green-500 flex flex-col md:flex-row items-center justify-between">
-                <div class="flex items-start mb-4 md:mb-0">
-                    <span class="text-4xl mr-4">📅</span>
-                    <div>
-                        <p class="text-lg font-semibold text-gray-800 mb-1">D-Day: <span class="text-red-600 font-extrabold">2026년 2월 15일 (토) 14시</span> (예상)</p>
-                        <p class="text-lg font-semibold text-gray-800">응시 단계: <span class="text-indigo-600 font-extrabold">일반 단계 or 심화 단계 선택</span></p>
-                    </div>
-                </div>
-                <div class="bg-yellow-400 text-gray-800 font-bold py-3 px-6 rounded-full shadow-lg text-center">
-                    <span class="text-xl">⚠️ 1월은 접수와 학습을 병행하는 가장 중요한 달입니다!</span>
-                </div>
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      });
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full -z-10 bg-[#f0fdf4]" />;
+};
+
+// 2. Navbar
+const Navbar = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <nav className={`fixed w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-md py-3' : 'bg-transparent py-6'}`}>
+      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+        <div className="flex items-center gap-3 cursor-pointer">
+          <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center shadow-lg shadow-teal-200">
+            <Atom className="text-white w-6 h-6" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-2xl font-black text-gray-800 tracking-tight leading-none">
+              달돌과학
+            </span>
+            <span className="text-[10px] font-bold text-teal-600 tracking-[0.2em] uppercase">
+              Daldol Science
+            </span>
+          </div>
+        </div>
+        
+        <div className="hidden md:flex items-center gap-8 text-sm font-bold text-gray-600">
+          <a href="#roadmap" className="hover:text-teal-600 transition-colors">마스터 플랜</a>
+          <a href="#data" className="hover:text-teal-600 transition-colors">입시 분석</a>
+          <a href="#reviews" className="hover:text-teal-600 transition-colors">명예의 전당</a>
+          <a href="tel:01075947857" className="flex items-center gap-2 text-teal-700 bg-teal-50 px-4 py-2 rounded-full hover:bg-teal-100 transition-colors">
+            <Phone size={16} /> 010-7594-7857
+          </a>
+        </div>
+
+        <button className="md:hidden text-gray-800" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          {mobileMenuOpen ? <X /> : <Menu />}
+        </button>
+      </div>
+      
+      {mobileMenuOpen && (
+        <div className="absolute top-full left-0 w-full bg-white border-b border-gray-200 p-6 shadow-xl flex flex-col gap-4">
+          <a href="#roadmap" onClick={() => setMobileMenuOpen(false)} className="text-lg font-bold text-gray-800">마스터 플랜</a>
+          <a href="#data" onClick={() => setMobileMenuOpen(false)} className="text-lg font-bold text-gray-800">입시 분석</a>
+          <div className="h-px bg-gray-100 my-2" />
+          <a href="tel:01075947857" className="flex items-center gap-3 text-lg font-bold text-teal-600">
+            <Phone /> 010-7594-7857
+          </a>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+// 3. HERO SECTION (UPDATED: Texts & Button)
+const Hero = () => {
+  return (
+    <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+      <style>{customStyles}</style>
+      
+      {/* Gradient Orbs */}
+      <div className="absolute top-20 right-0 w-[600px] h-[600px] bg-gradient-to-bl from-teal-200/40 to-transparent rounded-full blur-3xl animate-pulse pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-green-200/40 to-transparent rounded-full blur-3xl animate-pulse pointer-events-none"></div>
+
+      <div className="max-w-6xl mx-auto px-6 text-center relative z-10">
+        
+        {/* Animated Text Block */}
+        <div className="mb-12 space-y-6">
+            <h2 className="text-4xl md:text-6xl font-black text-gray-400 tracking-tight opacity-80 animate-float">
+                과학 영재의 꿈,
+            </h2>
+
+            <div className="relative inline-block">
+                <h1 className="text-5xl md:text-8xl font-black tracking-tighter leading-none mb-4 animate-starburst text-transparent bg-clip-text bg-gradient-to-r from-teal-600 via-green-600 to-indigo-600">
+                    달돌과학 1:1 시스템
+                </h1>
+                <Sparkles className="absolute -top-8 -right-8 w-12 h-12 text-yellow-400 animate-spin-slow" />
             </div>
-        </section>
-
-        
-        <section class="mb-12">
-            <h2 class="text-2xl md:text-3xl font-bold text-teal-600 mb-6 border-l-4 border-teal-400 pl-3">🗺️ KMChC 4개월 월별 초점 전략</h2>
-            <p class="text-gray-700 mb-6">4개월 만에 일반화학 기초를 완성하고 시험에 응시하기 위한 **월별 초고강도 학습 목표**입니다.</p>
             
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div id="step1" class="step-card bg-white p-4 rounded-xl shadow-md border-t-4 border-indigo-400 text-center" onclick="showPhaseDetail(1)">
-                    <div class="text-4xl mb-2">⚛️</div>
-                    <p class="font-bold text-lg text-indigo-700">STEP 1. 원자/결합 폭파</p>
-                    <p class="text-sm text-gray-500">11월</p>
-                </div>
-                <div id="step2" class="step-card bg-white p-4 rounded-xl shadow-md border-t-4 border-teal-400 text-center" onclick="showPhaseDetail(2)">
-                    <div class="text-4xl mb-2">🔥</div>
-                    <p class="font-bold text-lg text-teal-700">STEP 2. 반응/평형 집중</p>
-                    <p class="text-sm text-gray-500">12월</p>
-                </div>
-                <div id="step3" class="step-card bg-white p-4 rounded-xl shadow-md border-t-4 border-green-400 text-center" onclick="showPhaseDetail(3)">
-                    <div class="text-4xl mb-2">📝</div>
-                    <p class="font-bold text-lg text-green-700">STEP 3. 1월 완성/접수</p>
-                    <p class="text-sm text-gray-500">1월</p>
-                </div>
-                <div id="step4" class="step-card bg-white p-4 rounded-xl shadow-md border-t-4 border-yellow-400 text-center" onclick="showPhaseDetail(4)">
-                    <div class="text-4xl mb-2">🏅</div>
-                    <p class="font-bold text-lg text-yellow-700">STEP 4. 2월 실전</p>
-                    <p class="text-sm text-gray-500">2월 1일 ~ 15일</p>
-                </div>
-            </div>
+            <p className="text-2xl md:text-3xl font-bold text-gray-700">
+                으로 <span className="text-indigo-600">완성하다.</span>
+            </p>
+        </div>
 
-            <div id="detail-panel" class="bg-white p-6 rounded-xl shadow-xl min-h-[200px] border-2 border-gray-200">
-                <p class="text-xl text-gray-500 text-center pt-8">👆 위 4단계를 클릭하시면 매월의 초고강도 학습 목표가 표시됩니다.</p>
-            </div>
-        </section>
+        {/* Shine Text */}
+        <div className="relative py-6 px-4 mb-16 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/50 inline-block shadow-lg">
+            <p className="text-3xl md:text-5xl font-black animate-text-shine tracking-tight">
+                "책에 없는 극상위 스킬로<br/>과학의 신을 만든다"
+            </p>
+        </div>
 
+        {/* UPDATED: "Impossible Effort" Text Style (Request 1) */}
+        <p className="text-2xl md:text-4xl mb-16 impossible-effort-text">
+            상상할 수 없는 노력만이 <br className="md:hidden"/>상상할 수 없는 결과를 만듭니다.
+        </p>
         
-        <section class="mb-12">
-            <h2 class="text-2xl md:text-3xl font-bold text-teal-600 mb-6 border-l-4 border-teal-400 pl-3">📈 4개월 초단기 학습 집중도 (절대적 시간표)</h2>
-            <p class="text-gray-700 mb-6">성공적인 2월 시험을 위해 **1월까지 일반화학 핵심 개념 90% 이상**을 달성해야 합니다.</p>
-            <div class="chart-container bg-white p-4 rounded-lg shadow-md">
-                <canvas id="timelineChart"></canvas>
-            </div>
-        </section>
+        {/* Call to Action */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <a href="#data" className="w-full sm:w-auto px-8 py-4 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-lg shadow-xl shadow-teal-200 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2">
+             <BarChart3 size={20} /> 입시 분석 데이터 보기
+          </a>
+          {/* UPDATED: Button Text and Link (Request 2) */}
+          <a href="https://www.youtube.com/@daldol2325" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto px-8 py-4 bg-white border-2 border-red-500 text-red-600 hover:bg-red-50 rounded-xl font-bold text-lg shadow-md hover:shadow-red-100 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2">
+             <Youtube size={24} className="fill-current"/> 과학 신화 달돌샘 유튜브 <span className="text-yellow-500 text-xl ml-1">⭐️🍀</span>
+          </a>
+        </div>
 
-        
-        <section class="mb-12">
-            <h2 class="text-2xl md:text-3xl font-bold text-teal-600 mb-6 border-l-4 border-teal-400 pl-3">🔗 응시 단계별 평가 범위 분석 (필수)</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <div class="bg-indigo-100 p-6 rounded-xl shadow-md border-2 border-indigo-400">
-                    <h3 class="text-xl font-bold text-indigo-800 mb-3">📘 일반 단계 (General Track)</h3>
-                    <ul class="list-disc list-inside text-gray-700 space-y-2">
-                        <li>**목표:** 화학 기본 개념 점검</li>
-                        <li>**주요 범위:** 원소, 결합, 산염기, 용액, 물질 상태, 열역학, 평형 등 **일반화학의 주요 10가지 개념**</li>
-                        <li>**특징:** 대학교 일반화학의 심화 수식보다는 **개념 적용** 문제 위주</li>
-                        <li class="font-bold text-red-600">추천: KMChC를 처음 접하는 학생 (안정적인 기초 확보)</li>
-                    </ul>
+      </div>
+    </section>
+  );
+};
+
+// 4. DATA INTELLIGENCE SECTION (UPDATED: Acceptance Bar Chart)
+const DataSection = () => {
+    return (
+        <section id="data" className="py-24 bg-white relative border-t border-gray-100">
+            <div className="max-w-7xl mx-auto px-6">
+                <div className="text-center mb-16">
+                    <span className="text-indigo-600 font-bold tracking-widest text-sm uppercase mb-2 block">Daldol Data Intelligence</span>
+                    <h2 className="text-3xl md:text-5xl font-black text-gray-900">
+                        입시 공학(Engineering)의 정수
+                    </h2>
                 </div>
 
-                
-                <div class="bg-white p-6 rounded-xl shadow-md border-2 border-gray-200">
-                    <h3 class="text-xl font-bold text-gray-800 mb-3">🔬 심화 단계 (Advanced Track)</h3>
-                    <ul class="list-disc list-inside text-gray-700 space-y-2">
-                        <li>**목표:** 우수 영재 선발 및 심화 학습 도전</li>
-                        <li>**주요 범위:** 일반화학 I/II **전 범위** (총괄성, 루이스 산염기, 전이금속, 유효 핵전하 등)</li>
-                        <li>**특징:** 복잡한 수식 유도, 논리적 사고력 요구 문제 다수</li>
-                        <li class="font-bold text-teal-600">추천: KChO 계절학교 준비를 염두에 둔 학생 (경쟁 우위 확보)</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="mt-8">
-                <h3 class="text-xl font-bold text-gray-800 mb-3">🌐 KMChC 공식 홈페이지 주소 (Fact Check 완료)</h3>
-                <p class="text-gray-700 mb-4">최종 공지와 자세한 시험 요강은 주관처에서 확인합니다.</p>
-                <a href="https://olympiad.kchem.org/" target="_blank" class="block w-full text-center bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 rounded-lg transition duration-300 shadow-md">
-                    🔗 KMChC/KChO 공식 홈페이지 바로가기
-                </a>
-            </div>
-        </section>
-
-    </div>
-
-    <script>
-        const phaseDetails = [
-            {
-                title: "⚛️ STEP 1. 원자/결합 폭파 (11월)",
-                color: "indigo",
-                content: `
-                    <div class="flex items-start">
-                        <span class="text-5xl mr-4">💨</span>
-                        <div>
-                            <p class="text-xl font-semibold text-gray-700 mb-2">KMChC의 핵심인 **원자 구조, 주기율표, 화학 결합** 개념을 완벽히 잡습니다.</p>
-                            <ul class="list-disc list-inside text-gray-700 space-y-2">
-                                <li>**범위:** 원자 구조, 주기적 성질, 화학 결합, 분자 구조, 기체/액체와 분자간 힘</li>
-                                <li>**핵심:** 오비탈, 루이스 구조, VSEPR 이론 등 일반화학에서 확장된 개념 정립</li>
-                                <li>**단순화:** '화학의 기본 언어'를 유창하게 구사할 수 있는 단계</li>
-                                <li>**기간:** 4주</li>
-                            </ul>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    
+                    {/* 1. Venn Diagram */}
+                    <div className="bg-gray-50 p-8 rounded-3xl border border-gray-200 shadow-lg hover:-translate-y-2 transition-transform duration-300 text-center">
+                        <div className="flex items-center justify-center gap-2 mb-6">
+                            <PieChart className="text-teal-600 w-6 h-6"/> 
+                            <h3 className="text-xl font-bold text-gray-800">합격의 3요소</h3>
                         </div>
+                        <div className="relative w-56 h-56 mx-auto mb-4">
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full bg-red-500/10 border-2 border-red-500 flex items-center justify-center text-sm font-bold text-red-800 pt-4">전략<br/>Strategy</div>
+                            <div className="absolute bottom-4 left-0 w-32 h-32 rounded-full bg-blue-500/10 border-2 border-blue-500 flex items-center justify-center text-sm font-bold text-blue-800 pb-4 pr-4">관리<br/>Care</div>
+                            <div className="absolute bottom-4 right-0 w-32 h-32 rounded-full bg-yellow-500/10 border-2 border-yellow-500 flex items-center justify-center text-sm font-bold text-yellow-800 pb-4 pl-4">콘텐츠<br/>Content</div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/4 bg-white px-3 py-1 rounded-full shadow-md border border-gray-200 font-black text-xs z-10">SUCCESS</div>
+                        </div>
+                        <p className="text-sm text-gray-500 mt-4">달돌과학은 3가지 핵심 요소의 완벽한 교집합을 만듭니다.</p>
                     </div>
-                `
-            },
-            {
-                title: "🔥 STEP 2. 반응/평형 집중 (12월)",
-                color: "teal",
-                content: `
-                    <div class="flex items-start">
-                        <span class="text-5xl mr-4">🌡️</span>
-                        <div>
-                            <p class="text-xl font-semibold text-gray-700 mb-2">KMChC에서 **배점이 높은 계산 파트(평형, 열역학)**에 집중합니다.</p>
-                            <ul class="list-disc list-inside text-gray-700 space-y-2">
-                                <li>**범위:** 열역학, 반응 속도, 화학 평형, 수용액 평형 (산염기 포함)</li>
-                                <li>**핵심:** 헤스 법칙, 평형 상수의 계산, 르샤틀리에 원리의 **응용 문제** 풀이</li>
-                                <li>**단순화:** '복잡한 계산도 두려워하지 않는' 문제 해결 능력 확보</li>
-                                <li>**기간:** 4주</li>
+
+                    {/* 2. J-Curve Graph */}
+                    <div className="bg-gray-50 p-8 rounded-3xl border border-gray-200 shadow-lg hover:-translate-y-2 transition-transform duration-300 text-center">
+                        <div className="flex items-center justify-center gap-2 mb-6">
+                            <TrendingUp className="text-indigo-600 w-6 h-6"/> 
+                            <h3 className="text-xl font-bold text-gray-800">성적 상승 J-Curve</h3>
+                        </div>
+                        <div className="relative w-full h-48 border-l-2 border-b-2 border-gray-300 mb-4 p-4 flex items-end justify-center">
+                             <svg className="w-full h-full overflow-visible" viewBox="0 0 200 100">
+                                <path d="M0,100 Q50,100 100,50 T200,0" fill="none" stroke="#4f46e5" strokeWidth="4" strokeLinecap="round" />
+                                <circle cx="0" cy="100" r="4" fill="#4f46e5" />
+                                <circle cx="100" cy="50" r="4" fill="#4f46e5" />
+                                <circle cx="200" cy="0" r="4" fill="#4f46e5" />
+                                <text x="160" y="-10" className="text-[10px] font-bold fill-indigo-600">Top 1%</text>
+                            </svg>
+                        </div>
+                        <p className="text-sm text-gray-500">개념 완성 후 폭발적인 실력 향상(Quantum Jump)을 경험합니다.</p>
+                    </div>
+
+                    {/* 3. UPDATED: Bar Chart (Request 3 - Medical/SNU/Sangsan/Seosam) */}
+                     <div className="bg-gray-50 p-8 rounded-3xl border border-gray-200 shadow-lg hover:-translate-y-2 transition-transform duration-300 text-center">
+                        <div className="flex items-center justify-center gap-2 mb-6">
+                            <Award className="text-yellow-600 w-6 h-6"/> 
+                            <h3 className="text-xl font-bold text-gray-800">매년 합격 배출!</h3>
+                        </div>
+                        <div className="w-full h-48 flex items-end justify-around gap-2 mb-4 px-2">
+                            
+                            {/* Bar 1: 의대 (Medical) */}
+                            <div className="w-1/4 flex flex-col items-center gap-2 group">
+                                <span className="text-[10px] font-bold text-red-600 group-hover:scale-110 transition-transform">의/치/약</span>
+                                <div className="w-full bg-gradient-to-t from-red-600 to-red-400 rounded-t-md h-32 relative shadow-md shadow-red-200 transition-all group-hover:h-36"></div>
                             </div>
-                    </div>
-                `
-            },
-            {
-                title: "📝 STEP 3. 1월 완성/접수 (1월)",
-                color: "green",
-                content: `
-                    <div class="flex items-start">
-                        <span class="text-5xl mr-4">🔋</span>
-                        <div>
-                            <p class="text-xl font-semibold text-gray-700 mb-2">일반화학 나머지 범위 완성 및 **시험 접수를 반드시 완료**해야 합니다.</p>
-                            <ul class="list-disc list-inside text-gray-700 space-y-2">
-                                <li>**범위:** 전기화학, 고체, 유기/분석화학 개념, 총괄성 등 일반화학 전 범위 마무리</li>
-                                <li>**핵심:** **1월 9일 ~ 2월 2일 (예상) 접수 기간 내 PC로 접수 완료**</li>
-                                <li>**단순화:** '이론 총정리 및 시험 응시 자격 확보' 단계</li>
-                                <li>**기간:** 4주</li>
-                            </ul>
+
+                             {/* Bar 2: 서울대 (SNU) */}
+                            <div className="w-1/4 flex flex-col items-center gap-2 group">
+                                <span className="text-[10px] font-bold text-blue-700 group-hover:scale-110 transition-transform">서울대</span>
+                                <div className="w-full bg-gradient-to-t from-blue-700 to-blue-500 rounded-t-md h-40 relative shadow-md shadow-blue-200 transition-all group-hover:h-44">
+                                    <Crown className="absolute -top-4 left-1/2 -translate-x-1/2 w-4 h-4 text-yellow-500 fill-current animate-bounce" />
+                                </div>
+                            </div>
+
+                            {/* Bar 3: 상산고 (Sangsan) */}
+                            <div className="w-1/4 flex flex-col items-center gap-2 group">
+                                <span className="text-[10px] font-bold text-green-600 group-hover:scale-110 transition-transform">상산고</span>
+                                <div className="w-full bg-gradient-to-t from-green-600 to-green-400 rounded-t-md h-28 relative shadow-md shadow-green-200 transition-all group-hover:h-32"></div>
+                            </div>
+
+                             {/* Bar 4: 서삼입시 (Seosam) */}
+                             <div className="w-1/4 flex flex-col items-center gap-2 group">
+                                <span className="text-[10px] font-bold text-purple-600 group-hover:scale-110 transition-transform">서삼/특목</span>
+                                <div className="w-full bg-gradient-to-t from-purple-600 to-purple-400 rounded-t-md h-24 relative shadow-md shadow-purple-200 transition-all group-hover:h-28"></div>
+                            </div>
+
                         </div>
+                        <p className="text-sm text-gray-500 font-bold">매년 <span className="text-red-600">의대/서울대</span> 및 <span className="text-green-600">특목자사</span> 합격 신화</p>
                     </div>
-                `
-            },
-            {
-                title: "🏅 STEP 4. 2월 실전 (2월 1일 ~ 15일)",
-                color: "yellow",
-                content: `
-                    <div class="flex items-start">
-                        <span class="text-5xl mr-4">⏰</span>
-                        <div>
-                            <p class="text-xl font-semibold text-gray-700 mb-2">시험 직전, 2주간 **공식 기출문제집**으로 실전 감각을 최대치로 끌어올립니다.</p>
-                            <ul class="list-disc list-inside text-gray-700 space-y-2">
-                                <li>**핵심:** **KMChC 기출문제 3개년 이상**을 시간 맞춰 풀이 및 오답 노트 정리</li>
-                                <li>**주의:** 일반/심화 단계별 문제 유형을 파악하고 목표 단계에 집중</li>
-                                <li>**단순화:** '아는 것만으로 합격'이 아닌, **'실수 없는 만점'**을 노리는 단계</li>
-                                <li>**기간:** 2주</li>
-                            </ul>
-                        </div>
-                    </div>
-                `
-            }
-        ];
 
-        function showPhaseDetail(step) {
-            const index = step - 1;
-            const detailPanel = document.getElementById('detail-panel');
-            const data = phaseDetails[index];
+                </div>
+            </div>
+        </section>
+    );
+};
 
-            detailPanel.innerHTML = `
-                <h3 class="text-2xl font-extrabold text-${data.color}-700 mb-4">${data.title}</h3>
-                ${data.content}
-            `;
+// 5. Roadmap Section (Existing)
+const Roadmap = () => {
+  const [activeTab, setActiveTab] = useState('2026');
+  const currentData = activeTab === '2026' ? roadmap2026 : roadmap2027;
 
-            document.querySelectorAll('.step-card').forEach(card => card.classList.remove('active', 'bg-green-200'));
-            document.getElementById('step' + step).classList.add('active', 'bg-green-200');
-        }
+  return (
+    <section id="roadmap" className="py-24 bg-green-50/50 relative">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-5xl font-extrabold text-indigo-800 mb-4">
+            🧪 KMChC & 입시 로드맵
+          </h2>
+          <p className="text-gray-600 text-lg">
+            목표 시점과 현재 학년을 고려한 <span className="font-bold text-teal-700 underline decoration-teal-400 decoration-4 underline-offset-4">이원화된 초고강도 전략</span>
+          </p>
+        </div>
 
-        function createTimelineChart() {
-            const ctx = document.getElementById('timelineChart').getContext('2d');
+        {/* Tab Switcher */}
+        <div className="flex justify-center mb-12">
+          <div className="bg-white p-2 rounded-xl shadow-lg border border-green-100 inline-flex">
+            <button
+              onClick={() => setActiveTab('2026')}
+              className={`px-8 py-3 rounded-lg text-sm md:text-lg font-bold transition-all ${activeTab === '2026' ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
+            >
+              2026 단기 완성 (현 중1/2) 🚀
+            </button>
+            <button
+              onClick={() => setActiveTab('2027')}
+              className={`px-8 py-3 rounded-lg text-sm md:text-lg font-bold transition-all ${activeTab === '2027' ? 'bg-teal-600 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
+            >
+              2027 장기 플랜 (현 초6/중1) 🌱
+            </button>
+          </div>
+        </div>
+
+        {/* Step Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {currentData.map((item, index) => (
+            <div 
+              key={index}
+              className={`bg-white rounded-xl p-6 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border-t-4 ${item.borderColor} cursor-default group`}
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div className={`w-12 h-12 rounded-full ${item.bgIcon} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                  <item.icon className={`w-6 h-6 ${item.color}`} />
+                </div>
+                <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-full">
+                  {item.year}
+                </span>
+              </div>
+
+              <h3 className={`text-xl font-extrabold mb-1 ${item.color}`}>
+                {item.title}
+              </h3>
+              <p className="text-sm font-bold text-gray-500 mb-4">{item.subtitle}</p>
+              
+              <p className="text-gray-600 text-sm mb-6 leading-relaxed border-l-2 border-gray-200 pl-3">
+                {item.desc}
+              </p>
+
+              <div className="space-y-3 bg-gray-50 rounded-lg p-4">
+                {item.details.map((detail, idx) => (
+                  <div key={idx} className="flex items-start gap-2 text-xs font-medium text-gray-700">
+                    <CheckCircle2 className={`w-3 h-3 mt-0.5 flex-shrink-0 ${item.color}`} />
+                    <span>{detail}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// 6. Reviews Section (Existing)
+const Reviews = () => {
+  return (
+    <section id="reviews" className="py-24 relative">
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[#f0fdf4] to-white -z-10" />
+      
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <span className="text-teal-600 font-bold tracking-widest text-sm uppercase mb-2 block">Hall of Fame</span>
+          <h2 className="text-3xl md:text-5xl font-black text-gray-800 mb-6">
+            결과로 증명하는 달돌과학 🎓
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            치열한 입시 현장에서 선택받은 진짜 이유, 합격생들의 생생한 후기로 확인하세요.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {reviews.map((review, idx) => (
+            <div key={idx} className={`bg-white p-8 rounded-2xl shadow-lg ${review.border} hover:-translate-y-2 transition-transform duration-300`}>
+              <div className="flex justify-between items-start mb-6">
+                <Quote className="text-gray-200 w-10 h-10" />
+                <div className="flex items-center gap-1">
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700`}>
+                    {review.tag.split(' ')[0]} 
+                  </span>
+                  <Sparkles className="w-4 h-4 text-yellow-400 fill-current" />
+                  <span className={`text-xs font-bold ${
+                    review.tag.includes("✅") ? "text-green-600" : 
+                    review.tag.includes("🏆") ? "text-teal-600" : "text-yellow-600"
+                  }`}>
+                    {review.tag.split(' ')[1]}
+                  </span>
+                </div>
+              </div>
+
+              <h4 className="text-xl font-bold text-gray-900 mb-4 leading-snug">
+                {review.title}
+              </h4>
+              <p className="text-gray-600 text-sm leading-relaxed mb-8">
+                "{review.content}"
+              </p>
+              
+              <div className="flex items-center gap-3 pt-6 border-t border-gray-100">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-gray-500 text-sm bg-gray-200`}>
+                  <review.icon className="w-5 h-5 text-gray-700" />
+                </div>
+                <p className="text-sm font-bold text-gray-800">{review.name}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// 7. Footer (Existing)
+const Footer = () => {
+  return (
+    <footer id="contact" className="bg-white border-t border-gray-200 pt-20 pb-10">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-16">
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center">
+                <Atom className="text-white w-5 h-5" />
+              </div>
+              <span className="text-2xl font-black text-gray-800">달돌과학</span>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-4 leading-normal">
+              <span className="bg-green-100 text-green-700 px-2 py-1 rounded-md inline-block mr-1">화학 올림피아반</span>
+              <span className="inline-block">12/1 개강❗️</span> <br />
+              <span className="text-teal-600 text-xl block mt-2">📍《자사 특목 생기부 우위 선점》</span>
+            </h3>
             
-            const monthLabels = ['10월 말', '11월', '12월', '1월', '2월 중순'];
-            
-            const timelineChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: monthLabels,
-                    datasets: [
-                        {
-                            label: '학습 진도 및 완벽도 (%)',
-                            data: [5, 30, 65, 90, 100], 
-                            borderColor: '#059669', 
-                            backgroundColor: 'rgba(5, 150, 105, 0.4)',
-                            pointBackgroundColor: '#059669',
-                            pointRadius: 6,
-                            fill: true,
-                            tension: 0.1, 
-                            yAxisID: 'y' 
-                        },
-                        {
-                            label: 'KMChC 시험일 (2/15)',
-                            data: [{x: 4, y: 100, r: 12}], 
-                            backgroundColor: '#f97316', 
-                            borderColor: '#ea580c',
-                            type: 'bubble', 
-                            yAxisID: 'y' 
-                        },
-                        {
-                            label: '접수 시작일 (1/9 예상)',
-                            data: [{x: 3.25, y: 50, r: 8}], 
-                            backgroundColor: '#3b82f6', 
-                            borderColor: '#2563eb',
-                            type: 'bubble', 
-                            yAxisID: 'y' 
-                        }
-                    ]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    responsive: true,
-                    scales: {
-                        x: {
-                            title: { display: true, text: '월 (Month) - 초단기 로드맵' },
-                            ticks: { maxRotation: 0, minRotation: 0 }
-                        },
-                        y: {
-                            min: 0,
-                            max: 105,
-                            title: { display: true, text: '학습 집중도 및 완벽도 (%)' },
-                            ticks: { stepSize: 20 },
-                            grid: { drawOnChartArea: false } 
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                title: function(tooltipItems) {
-                                    const item = tooltipItems[0];
-                                    let label = item.chart.data.labels[item.dataIndex];
-                                    if (Array.isArray(label)) {
-                                      return label.join(' ');
-                                    } else {
-                                      return label;
-                                    }
-                                },
-                                label: function(context) {
-                                    if (context.datasetIndex === 1) { 
-                                        return '🥇 KMChC 시험일 (2/15 예상)';
-                                    }
-                                    if (context.datasetIndex === 2) {
-                                        return '📝 접수 시작일 (1/9 예상)';
-                                    }
-                                    return context.dataset.label + ': ' + context.formattedValue + '%';
-                                }
-                            }
-                        },
-                        legend: { position: 'top' }
-                    }
-                }
-            });
-        }
+            <div className="flex flex-col sm:flex-row gap-4">
+              <a 
+                href="tel:01075947857"
+                className="px-8 py-4 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-bold text-lg transition-all shadow-xl flex items-center justify-center gap-3"
+              >
+                <Phone size={20} />
+                010-7594-7857 상담 예약
+              </a>
+            </div>
+          </div>
 
-        window.onload = () => {
-            showPhaseDetail(1);
-            createTimelineChart();
-        };
-    </script>
-</body>
-</html>
+          <div className="bg-green-50 rounded-2xl p-8 border border-green-100">
+            <h4 className="font-bold text-teal-800 mb-6 text-lg">구리 남양주의 신화 달돌과학</h4>
+            <ul className="space-y-6">
+              <li className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-white text-teal-600 flex items-center justify-center shadow-sm">
+                  <Phone size={20} />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 font-bold uppercase mb-1">상담 문의</p>
+                  <p className="text-lg font-bold text-gray-800">010-7594-7857</p>
+                </div>
+              </li>
+              <li className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-white text-red-600 flex items-center justify-center shadow-sm">
+                  <Youtube size={20} />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 font-bold uppercase mb-1">공식 채널</p>
+                  <a href="https://www.youtube.com/@daldol2325" target="_blank" rel="noreferrer" className="text-lg font-bold text-gray-800 hover:underline">
+                    youtube.com/@daldol2325
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div className="text-center text-xs text-gray-400 border-t border-gray-100 pt-8">
+          © 2025 Daldol Science Academy. All rights reserved.
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+const App = () => {
+  return (
+    <div className="bg-[#f0fdf4] min-h-screen font-sans text-gray-800 selection:bg-teal-100 selection:text-teal-900">
+      <ParticleBackground />
+      <Navbar />
+      <main>
+        <Hero />
+        <DataSection />
+        <Roadmap />
+        <Reviews />
+        <Footer />
+      </main>
+    </div>
+  );
+};
+
+export default App;
